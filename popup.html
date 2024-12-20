@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html class="dark">
+<head>
+    <title>X Post Assistant</title>
+    <meta charset='utf-8'>
+    <style>
+        :root {
+            --primary: #1D9BF0;
+            --primary-hover: #1A8CD8;
+            --bg-dark: #15202B;
+            --bg-darker: #192734;
+            --text: #E7E9EA;
+            --text-secondary: #8B98A5;
+            --border: #38444D;
+            --success: #00BA7C;
+            --error: #F4212E;
+            --input-bg: #273340;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            width: 450px;
+            min-height: 700px;
+            max-height: 850px;
+            background: var(--bg-dark);
+            color: var(--text);
+            margin: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        
+        .container {
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            max-width: 100%; /* Ensure no element exceeds container width */
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding: 4px;
+            background: var(--bg-darker);
+            border-radius: 20px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 16px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: rgba(29, 155, 240, 0.1);
+            color: var(--primary);
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            max-height: 300px;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 15px;
+            resize: vertical; /* Only allow vertical resizing */
+            box-sizing: border-box;
+            overflow-x: hidden; /* Prevent horizontal scroll in textarea */
+        }
+
+        #generated-content {
+            flex-grow: 1; /* Allow this section to grow */
+            display: flex;
+            flex-direction: column;
+        }
+
+        #generated-text {
+            flex-grow: 1; /* Allow textarea to grow within its container */
+            min-height: 150px; /* Increased minimum height */
+        }
+
+        .debug-log {
+            margin-top: 15px;
+            max-height: 120px; /* Increased from 100px */
+            overflow-y: auto;
+            background: var(--bg-darker);
+            padding: 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        /* Custom scrollbar for textareas and debug log */
+        textarea::-webkit-scrollbar,
+        .debug-log::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        textarea::-webkit-scrollbar-track,
+        .debug-log::-webkit-scrollbar-track {
+            background: var(--bg-darker);
+            border-radius: 4px;
+        }
+
+        textarea::-webkit-scrollbar-thumb,
+        .debug-log::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        textarea::-webkit-scrollbar-thumb:hover,
+        .debug-log::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Add character count */
+        .character-count {
+            text-align: right;
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .original-post {
+            margin: 12px 0;
+            padding: 12px;
+            background: var(--bg-darker);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+        }
+        
+        .original-post-header {
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        .original-post-content {
+            color: var(--text);
+            line-height: 1.4;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 24px;
+            background: var(--primary);
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .button:hover {
+            background: var(--primary-hover);
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .button-group {
+            width: 100%;
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            box-sizing: border-box;
+        }
+    
+        .button.secondary {
+            background: var(--bg-darker);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+    
+        .button.secondary:hover {
+            background: var(--input-bg);
+        }
+
+        .status {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .status.success {
+            background: rgba(0, 186, 124, 0.1);
+            color: var(--success);
+        }
+
+        .status.error {
+            background: rgba(244, 33, 46, 0.1);
+            color: var(--error);
+        }
+
+        .status.info {
+            background: rgba(29, 155, 240, 0.1);
+            color: var(--primary);
+        }
+
+        .settings {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .settings h3 {
+            margin-bottom: 12px;
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        .api-key-input {
+            width: 100%;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .api-key-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .debug-section {
+            margin-top: 20px;
+        }
+
+        .debug-log {
+            padding: 12px;
+            background: var(--bg-darker);
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .debug-log strong {
+            color: var(--primary);
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-darker);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="icons/icon48.png" alt="X Post Assistant">
+            <h1>X Post Assistant</h1>
+        </div>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="newPost">New Post</button>
+            <button class="mode-btn" data-mode="reply">Reply</button>
+        </div>
+
+        <div id="original-post" class="original-post" style="display: none;">
+            <div class="original-post-header">Replying to:</div>
+            <div id="original-post-content" class="original-post-content"></div>
+        </div>
+
+        <div class="input-group">
+            <label class="input-label" for="content-input">What would you like to post about?</label>
+            <textarea id="content-input" placeholder="Enter your topic or idea..."></textarea>
+        </div>
+
+        <div id="generated-content" class="input-group" style="display: none;">
+            <label class="input-label" for="generated-text">Generated Content (edit if needed)</label>
+            <textarea id="generated-text" placeholder="Generated content will appear here..."></textarea>
+        </div>
+        
+        <div class="button-group">
+            <button id="generate-btn" class="button">Generate Content</button>
+            <button id="post-btn" class="button" style="display: none;">Post to X</button>
+            <button id="clear-state" class="button secondary" style="display: none;">Clear Draft</button>
+        </div>
+        
+        <div id="draft-indicator" class="draft-indicator" style="display: none;">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M12 2v10m0 0v10m0-10h10m-10 0H2" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span>Draft saved</span>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <!-- Add character count -->
+        <div class="character-count">
+            <span id="char-count">0</span>/280
+        </div>
+
+        <div class="settings">
+            <h3>Settings</h3>
+            <input type="password" 
+                   class="api-key-input" 
+                   id="api-key" 
+                   placeholder="Enter your OpenAI API key">
+            <button id="save-api-key" class="button">Save API Key</button>
+        </div>
+
+        <div class="debug-section">
+            <div class="debug-log">
+                <strong>Debug Log:</strong>
+                <pre id="log-content"></pre>
+            </div>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
