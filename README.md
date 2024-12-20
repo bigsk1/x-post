@@ -2,6 +2,8 @@
 
 A Firefox extension that helps automate post creation and replies on X (formerly Twitter) using ChatGPT-4.
 
+![x-post](https://imagedelivery.net/WfhVb8dSNAAvdXUdMfBuPQ/ac3f4bda-8be5-49af-29a1-5ea02c744100/public)
+
 ## Features
 
 - Generate new posts using AI
