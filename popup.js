@@ -126,17 +126,35 @@ async function loadState() {
 
 // Initialize the popup
 document.addEventListener('DOMContentLoaded', async () => {
-    // Load saved API key
-    browser.storage.local.get(['openaiApiKey']).then((result) => {
-        if (result.openaiApiKey) {
-            const apiKeyInput = document.getElementById('api-key');
-            if (apiKeyInput) {
-                apiKeyInput.value = result.openaiApiKey;
-            }
+        // Load provider settings
+        const settings = await browser.storage.local.get([
+            'aiProvider', 
+            'openaiApiKey', 
+            'xaiApiKey',
+            'openaiModel',
+            'xaiModel'
+        ]);
+
+        if (settings.aiProvider) {
+            document.getElementById('ai-provider').value = settings.aiProvider;
+            document.getElementById('openai-settings').style.display = 
+                settings.aiProvider === 'openai' ? 'block' : 'none';
+            document.getElementById('xai-settings').style.display = 
+                settings.aiProvider === 'xai' ? 'block' : 'none';
         }
-    }).catch(error => {
-        showStatus('Error loading API key: ' + error.message, 'error');
-    });
+
+        if (settings.openaiApiKey) {
+            document.getElementById('openai-key').value = settings.openaiApiKey;
+        }
+        if (settings.xaiApiKey) {
+            document.getElementById('xai-key').value = settings.xaiApiKey;
+        }
+        if (settings.openaiModel) {
+            document.getElementById('openai-model').value = settings.openaiModel;
+        }
+        if (settings.xaiModel) {
+            document.getElementById('xai-model').value = settings.xaiModel;
+        }
 
     // Load previous state
     await loadState();
@@ -270,9 +288,11 @@ async function generateContent() {
 
     try {
         // Check for API key first
-        const { openaiApiKey } = await browser.storage.local.get('openaiApiKey');
-        if (!openaiApiKey) {
-            showStatus('Please set your OpenAI API key first', 'error');
+        const settings = await browser.storage.local.get(['aiProvider', 'openaiApiKey', 'xaiApiKey']);
+        const provider = settings.aiProvider || 'openai';
+        const apiKey = provider === 'openai' ? settings.openaiApiKey : settings.xaiApiKey;
+        if (!apiKey) {
+            showStatus(`Please set your ${provider.toUpperCase()} API key first`, 'error');
             return;
         }
 
@@ -327,33 +347,57 @@ async function generateContent() {
     }
 }
 
+// Handle provider selection
+document.getElementById('ai-provider').addEventListener('change', (e) => {
+    const provider = e.target.value;
+    document.getElementById('openai-settings').style.display = 
+        provider === 'openai' ? 'block' : 'none';
+    document.getElementById('xai-settings').style.display = 
+        provider === 'xai' ? 'block' : 'none';
+});
+
 async function saveApiKey() {
-    const apiKeyInput = document.getElementById('api-key');
-    if (!apiKeyInput || !apiKeyInput.value.trim() === '') {
+    const provider = document.getElementById('ai-provider').value;
+    const apiKey = document.getElementById(`${provider}-key`).value;
+    const model = document.getElementById(`${provider}-model`).value;
+
+    if (!apiKey || apiKey.trim() === '') {
         showStatus('Please enter an API key', 'error');
         return;
     }
 
-    const apiKey = apiKeyInput.value.trim();
-    // Verify API key format (basic check)
-    if (!apiKey.startsWith('sk-') || apiKey.length < 20) {
-        showStatus('Invalid API key format. Please check your API key.', 'error');
-        return;
+    // Updated API key validation for OpenAI
+    if (provider === 'openai') {
+        // Check for both new and old format
+        const isNewFormat = apiKey.startsWith('sk-proj-');
+        const isOldFormat = apiKey.startsWith('sk-');
+        
+        if (!isNewFormat && !isOldFormat) {
+            showStatus('Invalid OpenAI API key format. Should start with sk-proj- or sk-', 'error');
+            return;
+        }
+
+        if (isNewFormat && apiKey.length < 20) {
+            showStatus('Invalid OpenAI API key length', 'error');
+            return;
+        }
     }
 
-    debugLog('Attempting to save API key');
+    debugLog('Attempting to save settings');
 
     try {
         await browser.runtime.sendMessage({
             type: 'setApiKey',
-            apiKey: apiKey
+            provider: provider,
+            apiKey: apiKey,
+            model: model
         });
         
-        showStatus('API key saved successfully!', 'success');
-        debugLog('API key updated');
+        showStatus('Settings saved successfully!', 'success');
+        debugLog('Settings updated');
     } catch (error) {
-        showStatus('Error saving API key: ' + error.message, 'error');
-        debugLog('Error saving API key: ' + error.message);
+        showStatus('Error saving settings: ' + error.message, 'error');
+        debugLog('Error saving settings: ' + error.message);
     }
 }
 

@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "X Post Assistant",
+  "name": "AI Post Assistant",
   "version": "1.0",
-  "description": "AI-powered X (Twitter) post assistant using ChatGPT-4",
+  "description": "AI-powered X post assistant using ChatGPT-4o and XAI",
   "icons": {
     "128": "icons/icon128.png"
   },

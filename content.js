@@ -53,31 +53,43 @@ if (!window.XPostAssistant) {
         // Get the original post content
         getOriginalPostContent: function() {
             try {
-                // Wait a bit for dynamic content if needed
                 const tweetArticle = document.querySelector(this.SELECTORS.originalPost);
                 if (!tweetArticle) {
                     throw new Error('Could not find original post');
                 }
-
-                // Get the tweet text
+        
                 const tweetText = tweetArticle.querySelector(this.SELECTORS.originalPostText);
                 if (!tweetText) {
                     throw new Error('Could not find tweet text');
                 }
-
-                // Get author info (try multiple selectors)
+        
+                // Enhanced image detection
+                let imageData = null;
+                const imageContainer = tweetArticle.querySelector('div[data-testid="tweetPhoto"]');
+                if (imageContainer) {
+                    const img = imageContainer.querySelector('img');
+                    if (img) {
+                        imageData = {
+                            url: img.src,
+                            alt: img.alt || ''
+                        };
+                        this.debugLog('Found image URL: ' + imageData.url);
+                    }
+                }
+        
+                // Get author info
                 let authorName = '';
                 const authorElement = tweetArticle.querySelector('a[role="link"] div[dir="ltr"] span');
                 if (authorElement) {
                     authorName = authorElement.textContent;
                 }
-
-                this.debugLog('Found tweet content: ' + tweetText.textContent);
-                
+        
                 return {
                     text: tweetText.textContent,
                     author: authorName,
-                    id: this.getCurrentPostId()
+                    id: this.getCurrentPostId(),
+                    hasImage: !!imageData,
+                    imageData: imageData
                 };
             } catch (error) {
                 this.debugLog('Error getting original post: ' + error.message);

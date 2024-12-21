@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="dark">
 <head>
-    <title>X Post Assistant</title>
+    <title>AI Post Assistant</title>
     <meta charset='utf-8'>
     <style>
         :root {
@@ -24,10 +24,11 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        body {
+        html, body {
             width: 450px;
-            min-height: 700px;
-            max-height: 850px;
+            min-height: 850px;
+            max-height: 950px;
+            overflow-y: auto;
             background: var(--bg-dark);
             color: var(--text);
             margin: 0;
@@ -61,8 +62,8 @@
         }
 
         .header img {
-            width: 32px;
-            height: 32px;
+            width: 48px;
+            height: 48px;
         }
 
         .header h1 {
@@ -283,6 +284,33 @@
             font-size: 16px;
         }
 
+        .setting-group {
+            margin-bottom: 16px;
+        }
+        
+        .select-input {
+            width: 100%;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 14px;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+        
+        .select-input option {
+            background: var(--bg-dark);
+            color: var(--text);
+            padding: 8px;
+        }
+        
+        .setting-group .input-label {
+            margin-bottom: 8px;
+            display: block;
+        }
+
         .api-key-input {
             width: 100%;
             padding: 12px;
@@ -350,8 +378,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <img src="icons/icon48.png" alt="X Post Assistant">
-            <h1>X Post Assistant</h1>
+            <img src="icons/icon48.png" alt="AI Post Assistant">
+            <h1>AI Post Assistant</h1>
         </div>
 
         <div class="mode-selector">
@@ -396,11 +424,40 @@
 
         <div class="settings">
             <h3>Settings</h3>
-            <input type="password" 
-                   class="api-key-input" 
-                   id="api-key" 
-                   placeholder="Enter your OpenAI API key">
-            <button id="save-api-key" class="button">Save API Key</button>
+            
+            <div class="setting-group">
+                <label class="input-label">AI Provider</label>
+                <select id="ai-provider" class="select-input">
+                    <option value="openai">OpenAI</option>
+                    <option value="xai">XAI</option>
+                </select>
+            </div>
+        
+            <div class="setting-group" id="openai-settings">
+                <label class="input-label">OpenAI Model</label>
+                <select id="openai-model" class="select-input">
+                    <option value="gpt-4o">GPT-4o</option>
+                    <option value="gpt-4o-mini">GPT-4o-mini</option>
+                </select>
+                <input type="password" 
+                       class="api-key-input" 
+                       id="openai-key" 
+                       placeholder="Enter your OpenAI API key">
+            </div>
+        
+            <div class="setting-group" id="xai-settings" style="display: none;">
+                <label class="input-label">XAI Model</label>
+                <select id="xai-model" class="select-input">
+                    <option value="grok-2-1212">Grok-2</option>
+                    <option value="grok-2-vision-1212">Grok-2 Vision</option>
+                </select>
+                <input type="password" 
+                       class="api-key-input" 
+                       id="xai-key" 
+                       placeholder="Enter your XAI API key">
+            </div>
+        
+            <button id="save-api-key" class="button">Save Settings</button>
         </div>
 
         <div class="debug-section">

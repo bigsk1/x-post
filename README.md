@@ -1,17 +1,29 @@
-# X Post Assistant Firefox Extension
+# X AI Post Assistant - Firefox Extension
 
-A Firefox extension that helps automate post creation and replies on X (formerly Twitter) using ChatGPT-4.
+A Firefox extension that helps automate post creation and replies on X using ChatGPT-4o or XAI api.
 
-![x-post](https://imagedelivery.net/WfhVb8dSNAAvdXUdMfBuPQ/ac3f4bda-8be5-49af-29a1-5ea02c744100/public)
+
+![x-post](https://imagedelivery.net/WfhVb8dSNAAvdXUdMfBuPQ/e436c543-e80e-4e9f-9ad4-8cd3e9bc4700/public)
+
 
 ## Features
 
-- Generate new posts using AI
-- Generate contextual replies to existing posts
-- Easy-to-use interface
-- Debug logging
-- Secure API key storage
-- Real-time content generation
+- Dual AI Provider Support:
+  - OpenAI GPT-4o/GPT-4o-mini integration
+  - X.AI Grok models with vision capabilities
+- Smart Content Generation:
+  - Create engaging new posts
+  - Generate contextual replies
+  - Image understanding for posts with media
+- Modern Dark Mode Interface:
+  - Clean, responsive design
+  - Character counter
+  - Real-time content preview
+- Advanced Features:
+  - Debug logging
+  - Secure API key storage
+  - State preservation
+  - Auto-posting option
 
 ## Installation
 
@@ -22,10 +34,15 @@ A Firefox extension that helps automate post creation and replies on X (formerly
 
 ## Setup
 
-1. Get your OpenAI API key from https://platform.openai.com/account/api-keys
+1. Get your API key:
+   - For OpenAI: https://platform.openai.com/account/api-keys
+   - For XAI: https://x.ai/api
 2. Click the extension icon in Firefox
-3. Enter your OpenAI API key in the settings section
-4. Click "Save API Key"
+3. Choose your AI provider (OpenAI or X.AI)
+4. Select your preferred model:
+   - OpenAI: GPT-4o or GPT-4o-mini
+   - XAI: Grok-2 Vision (supports image analysis)
+5. Enter your API key and save settings
 
 ## Usage
 
@@ -40,39 +57,57 @@ A Firefox extension that helps automate post creation and replies on X (formerly
 
 ### Replying to Posts
 
-1. Navigate to the post you want to reply to on X
+1. Navigate to a post on X
 2. Click the extension icon
 3. Select "Reply" mode
-4. The post content will be automatically captured
-5. Click "Generate Content"
-6. Review the generated reply
-7. Click "Post to X" to publish your reply
+4. The extension will automatically:
+   - Capture the original post text
+   - Analyze any images (when using Grok Vision)
+   - Generate a contextual reply
+5. Review and edit the generated reply
+6. Click "Post to X" to publish
+
+### Image Understanding
+
+When using X.AI's Grok Vision model:
+- The extension automatically detects images in posts
+- Generates responses that reference both text and visual content
+- Provides more contextually aware replies
 
 ## Debug Mode
 
-The extension includes a debug log panel that shows detailed information about operations and any errors that occur.
+The extension includes a comprehensive debug panel that shows:
+- API responses
+- Content generation process
+- Image detection status
+- Error messages
+- State changes
 
 ## Troubleshooting
 
-1. If posts aren't being published:
-   - Make sure you're logged into X
-   - Check the debug log for errors
-   - Ensure the API key is correctly set
+1. API Issues:
+   - Verify your API key format
+   - Check debug logs for response errors
+   - Ensure you're using the correct provider settings
 
-2. If content generation fails:
-   - Verify your API key is correct
+2. Post Generation Issues:
+   - Make sure you're logged into X
    - Check your internet connection
-   - Review the debug log for specific errors
+   - Review debug logs for specific errors
+
+3. Image Analysis Issues:
+   - Ensure you're using the Grok Vision model
+   - Check if the image is loading properly
+   - Verify image URL accessibility
 
 ## Privacy & Security
 
-- Your OpenAI API key is stored locally in your browser
-- No data is sent to any servers except OpenAI and X
-- All communications are encrypted
+- API keys are stored securely in local browser storage
+- No data is sent to third-party servers
+- Only communicates with OpenAI/X.AI APIs and X
+- All API communications are encrypted
+- No tracking or analytics
 
-## Support
-
-For issues and feature requests, please create an issue in the repository.
 
 ## License
 
